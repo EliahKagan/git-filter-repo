@@ -2065,8 +2065,9 @@ EXAMPLES
         help=_("By default, since commits are rewritten and thus gain new "
                "hashes, references to old commit hashes in commit messages "
                "are replaced with new commit hashes (abbreviated to the same "
-               "length as the old reference).  Use this flag to turn off "
-               "updating commit hashes in commit messages."))
+               "length as the old reference, if it was abbreviated).  Use "
+               "this flag to turn off updating commit hashes in commit "
+               "messages."))
     messages.add_argument('--preserve-commit-encoding', action='store_true',
         help=_("Do not reencode commit messages into UTF-8.  By default, if "
                "the commit object specifies an encoding for the commit "
@@ -3625,6 +3626,10 @@ class RepoFilter(object):
       new_hash = self._get_rename(old_hash)
 
     assert new_hash is not None
+    if orig_len == len(old_hash):
+      # A full hash; keep it full even if the new hash is longer (e.g.
+      # sha1 -> sha256)
+      return new_hash
     return new_hash[0:orig_len]
 
   def _maybe_trim_extra_parents(self, orig_parents, parents):

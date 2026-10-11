@@ -386,6 +386,40 @@ test_expect_success 'commit hash unchanged if requested' '
 	)
 '
 
+test_expect_success 'commit message rewrite from sha1 to sha256' '
+	git init --object-format=sha1 msg_hash_sha1 &&
+	(
+		cd msg_hash_sha1 &&
+		test_commit first &&
+		old=$(git rev-parse first) &&
+		test ${#old} = 40 &&
+		cat >msg <<-EOF &&
+		second
+
+		Full: $old
+		Short: ${old:0:7}
+		Longer: ${old:0:12}
+		EOF
+		git commit --allow-empty -F msg &&
+		git tag second
+	) &&
+	git init --object-format=sha256 msg_hash_sha256 &&
+	git filter-repo --source msg_hash_sha1 --target msg_hash_sha256 --force &&
+	(
+		cd msg_hash_sha256 &&
+		test sha256 = $(git rev-parse --show-object-format) &&
+		new=$(git rev-parse first) &&
+		test ${#new} = 64 &&
+		cat >expect <<-EOF &&
+		Full: $new
+		Short: ${new:0:7}
+		Longer: ${new:0:12}
+		EOF
+		git log --no-walk --format=format:%b second >actual &&
+		test_cmp expect actual
+	)
+'
+
 test_expect_success 'prepare signature tests' '
 	cat >sig_input <<-\EOF
 	feature done

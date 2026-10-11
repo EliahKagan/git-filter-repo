@@ -200,8 +200,8 @@ Filtering of commit messages (see also --message-callback)
 	By default, since commits are rewritten and thus gain new
 	hashes, references to old commit hashes in commit messages are
 	replaced with new commit hashes (abbreviated to the same
-	length as the old reference).  Use this flag to turn off
-	updating commit hashes in commit messages.
+	length as the old reference, if it was abbreviated).  Use this
+	flag to turn off updating commit hashes in commit messages.
 
 --preserve-commit-encoding::
 	Do not reencode commit messages into UTF-8. By default, if the
