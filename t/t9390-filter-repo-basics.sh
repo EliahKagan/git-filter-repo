@@ -353,6 +353,12 @@ test_expect_success 'commit message rewrite' '
 		git log --no-walk --format=%s HEAD~202 >actual &&
 		test_cmp expect actual &&
 
+		# A full commit hash is rewritten to the full new hash.
+		name=$(git rev-parse HEAD~202) &&
+		echo "This reverts commit $name." >expect &&
+		git log --no-walk --format=%b HEAD~201 | grep reverts >actual &&
+		test_cmp expect actual &&
+
 		# If a commit we reference was pruned, then the reference
 		# has nothing to be rewritten to.  Verify that the commit
 		# ID it points to does not exist.
